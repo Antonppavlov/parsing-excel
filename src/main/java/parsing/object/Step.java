@@ -1,4 +1,4 @@
-package object;
+package parsing.object;
 
 public class Step {
     public String numberBR;

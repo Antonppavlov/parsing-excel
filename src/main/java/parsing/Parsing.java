@@ -1,5 +1,7 @@
-import object.Step;
-import object.TestCase;
+package parsing;
+
+import parsing.object.Step;
+import parsing.object.TestCase;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
@@ -9,32 +11,33 @@ import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Read {
+public class Parsing {
 
-    public static void main(String[] args) throws Exception {
-        HSSFSheet allRows = getAllRows("src/main/resources/");
-        List<TestCase> listTestCase = getListTestCase(allRows);
-        System.out.println();
-    }
+    public static List<TestCase> getListTestCase(String STREAM_NAME) throws Exception {
+        HSSFSheet allRows = getAllRows("src/main/resources/" + STREAM_NAME + ".xls");
 
-    private static List<TestCase> getListTestCase(HSSFSheet allRows) {
-        List<TestCase> testCases = new ArrayList<TestCase>();
-        String featureName = null;
+
+        List<TestCase> testCases = new ArrayList<>();
+        String featureName = STREAM_NAME;
         for (int rowNumber = 0; rowNumber <= allRows.getLastRowNum(); rowNumber++) {
             HSSFRow row = allRows.getRow(rowNumber);
 
             if (getFeatureName(row) != null) {
                 featureName = getFeatureName(row);
-
+                System.out.println(featureName);
             }
 
             if (getNameTestCase(row) != null) {
                 String nameTestCase = getNameTestCase(row);
                 testCases.add(
                         new TestCase(
-                                "123",
+                                STREAM_NAME,
                                 featureName,
                                 nameTestCase,
+//                                getTextInCell(allRows.getRow(rowNumber).getCell(2)),
+//                                getTextInCell(allRows.getRow(rowNumber).getCell(16)),
+//                                getTextInCell(allRows.getRow(rowNumber).getCell(15)),
+//                                getTextInCell(allRows.getRow(rowNumber).getCell(0)),
                                 allRows.getRow(rowNumber).getCell(2).toString(),
                                 allRows.getRow(rowNumber).getCell(16).toString(),
                                 allRows.getRow(rowNumber).getCell(15).toString(),
@@ -57,7 +60,6 @@ public class Read {
         for (int i = rowNumber + 1; i <= allRows.getLastRowNum(); i++) {
             HSSFRow row = allRows.getRow(i);
 
-            System.out.println(rowNumber);
             HSSFCell priority = row.getCell(2);
 
             boolean testCaseNameRow = false;
@@ -86,11 +88,28 @@ public class Read {
         return steps;
     }
 
+
     private static String getTextInCell(HSSFCell hssfCell) {
         if (hssfCell == null) {
             return "";
         }
-        return hssfCell.getStringCellValue();
+        return hssfCell.getStringCellValue()
+                .replace("\r\n\r\n","\n")
+                .replace("\r\n","\n")
+                .replace("\t\n","\n")
+                .replace("\t","\n")
+                .replace("\n\n","\n")
+                .replace("0. ","0.")
+                .replace("1. ","1.")
+                .replace("2. ","2.")
+                .replace("3. ","3.")
+                .replace("4. ","4.")
+                .replace("5. ","5.")
+                .replace("6. ","6.")
+                .replace("7. ","7.")
+                .replace("8. ","8.")
+                .replace("9. ","9.")
+                ;
     }
 
 
@@ -109,6 +128,7 @@ public class Read {
                 return null;
             }
             featureName = row.getCell(3).toString();
+
         }
 
         return featureName;
